@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from openpyxl import load_workbook, Workbook
 
 # Set page title
 st.set_page_config(page_title="Data Visualization App", page_icon=":bar_chart:")
@@ -24,7 +25,15 @@ uploaded_file = st.sidebar.file_uploader("Choose a CSV or Excel file", type=["cs
 
 if uploaded_file is not None:
     # Load data into a Pandas dataframe
-    data = pd.read_csv(uploaded_file) if uploaded_file.name.endswith('.csv') else pd.read_excel(uploaded_file)
+    # data = pd.read_csv(uploaded_file) if uploaded_file.name.endswith('.csv') else pd.read_excel(uploaded_file)
+
+    if uploaded_file.name.endswith('.csv'):
+        data = pd.read_csv(uploaded_file)
+    else:
+        try:
+            data = pd.read_excel(uploaded_file)
+        except:
+            data = pd.read_excel(uploaded_file, engine='openpyxl')
 
     # Display the loaded data
     st.write("## Data")
