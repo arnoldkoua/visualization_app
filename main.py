@@ -32,6 +32,22 @@ def page_upload():
 
         st.success("Data uploaded successfully.")
 
+def download_button(data, filename, fileformat):
+    """Creates a download button for a file."""
+    if fileformat == 'csv':
+        filedata = to_csv(data)
+        mime_type = 'text/csv'
+        file_ext = 'csv'
+    elif fileformat == 'excel':
+        filedata = to_excel(data)
+        mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        file_ext = 'xlsx'
+    else:
+        raise ValueError(f"Unsupported file format: {fileformat}")
+    b64 = base64.b64encode(filedata).decode()
+    href = f'<a href="data:{mime_type};base64,{b64}" download="{filename}.{file_ext}">Download {filename} ({file_ext})</a>'
+    return href
+
 def page_visualize():
     st.title("Visualize Data")
 
@@ -49,14 +65,16 @@ def page_visualize():
     numerical_cols = list(data.select_dtypes(include=['float64', 'int64']).columns)
     categorical_cols = list(data.select_dtypes(include=['object']).columns)
 
-    selected_numerical_cols = st.sidebar.multiselect("Numerical Variables", numerical_cols)
-    selected_categorical_cols = st.sidebar.multiselect("Categorical Variables", categorical_cols)
+    selected_numerical_cols = st.sidebar.multiselect("Select Numerical Variables", numerical_cols)
+    selected_categorical_cols = st.sidebar.multiselect("Select Categorical Variables", categorical_cols)
 
     if selected_numerical_cols:
         st.header("Numerical Variables")
 
         numerical_data = data[selected_numerical_cols]
-        st.write(numerical_data.describe())
+        numeric_desc = numerical_data.describe()
+        st.write(numeric_desc)
+        st.markdown(download_button(numeric_desc, f"Describe_numerical_variables", 'excel'), unsafe_allow_html=True)
 
         for col in selected_numerical_cols:
             st.write(f"### {col}")
@@ -75,7 +93,9 @@ def page_visualize():
         st.header("Categorical Variables")
 
         categorical_data = data[selected_categorical_cols]
-        st.write(categorical_data.describe())
+        categorical_desc = categorical_data.describe()
+        st.write(categorical_desc)
+        st.markdown(download_button(categorical_desc, f"Describe_categorical_variables", 'excel'), unsafe_allow_html=True)
 
         for col in selected_categorical_cols:
             st.write(f"### {col}")
@@ -97,22 +117,6 @@ def to_excel(df):
     writer.save()
     excel_file.seek(0)
     return excel_file.getvalue()
-
-def download_button(data, filename, fileformat):
-    """Creates a download button for a file."""
-    if fileformat == 'csv':
-        filedata = to_csv(data)
-        mime_type = 'text/csv'
-        file_ext = 'csv'
-    elif fileformat == 'excel':
-        filedata = to_excel(data)
-        mime_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        file_ext = 'xlsx'
-    else:
-        raise ValueError(f"Unsupported file format: {fileformat}")
-    b64 = base64.b64encode(filedata).decode()
-    href = f'<a href="data:{mime_type};base64,{b64}" download="{filename}.{file_ext}">Download {filename} ({file_ext})</a>'
-    return href
 
 def page_cross_tables():
     st.title("Cross Tables")
