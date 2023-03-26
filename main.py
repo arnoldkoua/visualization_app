@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 import base64
 import io
-from xlsxwriter import Workbook
+# from xlsxwriter import Workbook
 from openpyxl import load_workbook, Workbook
 
 def get_session_state():
@@ -92,7 +92,7 @@ def page_visualize():
 def to_excel(df):
     """Converts a pandas DataFrame to an Excel file."""
     excel_file = io.BytesIO()
-    writer = pd.ExcelWriter(excel_file, engine='xlsxwriter')
+    writer = pd.ExcelWriter(excel_file, engine='openpyxl')
     df.to_excel(writer, index=True)
     writer.save()
     excel_file.seek(0)
