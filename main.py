@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 import base64
 import io
-import xlsxwriter
+from xlsxwriter import Workbook
 from openpyxl import load_workbook, Workbook
 
 def get_session_state():
